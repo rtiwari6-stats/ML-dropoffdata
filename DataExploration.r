@@ -51,4 +51,51 @@ summary(train_data$Target)
 barplot(summary(test_data$Target), main = "Class frequency for test data")
 summary(test_data$Target)
 
+library(dplyr)
+glimpse(train_data) #tells us which colmuns can be factors
+#marital status, Daytime.evening.attendance., Displaced, Educational.special.needs, 
+# Debtor, Tuition.fees.up.to.date, Gender, Scholarship.holder, International
+
+#look at categorical variables
+table(train_data$Marital.status)
+table(train_data$Daytime.evening.attendance.)
+table(train_data$Displaced)
+table(train_data$Educational.special.needs)
+table(train_data$Debtor)
+table(train_data$Tuition.fees.up.to.date)
+table(train_data$Gender)
+table(train_data$Scholarship.holder)
+table(train_data$International)
+
+#two-way dependene
+#let us be smart, write a function!
+two_way_dependence_plot = function(var, varname){
+  var_target = table(train_data$Target, var)
+  barplot(var_target, main=paste(varname, " and dropout"), legend.text = TRUE)
+}
+
+two_way_dependence_plot(train_data$Marital.status, "Marital Status") #no
+two_way_dependence_plot(train_data$Daytime.evening.attendance., 
+                      "Daytime.evening.attendance") #no
+two_way_dependence_plot(train_data$Displaced, "Displaced") #no
+two_way_dependence_plot(train_data$Educational.special.needs, "Educational.special.needs") #no
+two_way_dependence_plot(train_data$Debtor, "Debtor") #seems like debtor has higher dropout
+two_way_dependence_plot(train_data$Tuition.fees.up.to.date, 
+                      "Tuition.fees.up.to.date") #higher when fees not up to date
+two_way_dependence_plot(train_data$Gender, "Gender") #no
+two_way_dependence_plot(train_data$Scholarship.holder, "Scholarship.holder") #no scholarship higer dropout
+two_way_dependence_plot(train_data$International, "International") #no
+
+#boxplots for continuous
+boxplot(train_data$GDP~train_data$Target, ylab = "GDP", xlab = "Target") #lower gdp for dropout
+boxplot(train_data$Inflation.rate~train_data$Target, 
+        ylab = "Inflation.rate", xlab = "Target")# nothing stands out?
+boxplot(train_data$Unemployment.rate~train_data$Target, ylab = "Unemployment.rate",
+        xlab = "Target") #hmmm, nothing special?
+
+#too many variables so we stop doing variable by variable
+#let's do automated
+require(DataExplorer)
+create_report(train_data)
+
 
