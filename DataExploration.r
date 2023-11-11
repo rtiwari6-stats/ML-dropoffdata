@@ -96,6 +96,8 @@ boxplot(train_data$Unemployment.rate~train_data$Target, ylab = "Unemployment.rat
 #too many variables so we stop doing variable by variable
 #let's do automated
 require(DataExplorer)
-create_report(train_data)
+introduce(train_data) #no missing values
+create_report(train_data, config = configure_report(add_plot_density = TRUE)) #report.html in current working directory
+
 
 
