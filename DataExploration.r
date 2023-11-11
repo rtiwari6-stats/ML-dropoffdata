@@ -14,8 +14,8 @@ if(SPLIT_AND_STORE){
   train = subset(full_data, sample == TRUE)
   test  = subset(full_data, sample == FALSE)
   
-  write.csv(train, "train_data.csv")
-  write.csv(test, "test_data.csv")
+  write.csv(train, "train_data.csv", row.names = FALSE)
+  write.csv(test, "test_data.csv", row.names = FALSE)
   
   train_data = read.csv("train_data.csv", header = TRUE)
   test_data = read.csv("test_data.csv", header = TRUE)
@@ -31,8 +31,8 @@ if(SPLIT_AND_STORE){
   test_data$Target = as.factor(ifelse(test_data$Target != "Dropout", "Not Dropout", "Dropout"))
   summary(test_data$Target)
   
-  write.csv(train_data, "train_data_two_class.csv")
-  write.csv(test_data, "test_data_two_class.csv")
+  write.csv(train_data, "train_data_two_class.csv", row.names = FALSE)
+  write.csv(test_data, "test_data_two_class.csv", row.names = FALSE)
   
 }
 
@@ -50,3 +50,5 @@ summary(train_data$Target)
 #check class distributions for test
 barplot(summary(test_data$Target), main = "Class frequency for test data")
 summary(test_data$Target)
+
+
