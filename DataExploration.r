@@ -22,7 +22,6 @@ test_data = read.csv("test_data.csv", header = TRUE)
 train_data$Target = as.factor(train_data$Target)
 test_data$Target = as.factor(test$Target)
 
-#check class distributions for both
+#check class distributions for train
 hist(as.integer(train$Target))
-hist(as.integer(test$Target)) # don't look at this again, this is just to show how test data looks like in the report.
 
