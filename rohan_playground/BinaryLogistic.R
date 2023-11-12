@@ -8,7 +8,6 @@ train_data = read.csv("train_data_two_class.csv", header = TRUE)
 test_data = read.csv("test_data_two_class.csv", header = TRUE)
 
 library(glmnet)
-library(caret)
 
 xtrain = train_data[ , !(names(train_data) %in% "Target")]
 xtrain = scale(xtrain) #scaling needed for lasso
@@ -34,9 +33,15 @@ lasso.pred = predict(cv.out, s = bestlam, newx = as.matrix(scale(xtest)), type="
 
 #apply a basic threshold of 0.5
 lasso.pred = ifelse(lasso.pred > 0.5, 1, 0)
-error_glm = mean(lasso.pred != ytest) #0.1266968 -- not bad!
+error_glm = mean(lasso.pred != ytest$Target) #0.1266968 -- not bad!
 error_glm
-
+##confusion matrix
+table(lasso.pred, ytest$Target)
+#roc auc
+require(pROC)
+roc_object = roc(ytest$Target, lasso.pred)
+auc(roc_object) #0.8266
+plot(roc_object)
 
 
 #also try using lambda1se
@@ -48,10 +53,16 @@ error_glm
 coef_cv1se=coef(cv.out, s = "lambda.1se")
 coef_cv1se
 
-#Test error with bestlam
+#Test error with lambda1se
 lasso.pred1se = predict(cv.out, s = lambda1se, newx = as.matrix(scale(xtest)), type="response")
-
+lasso.pred1se = ifelse(lasso.pred1se > 0.5, 1, 0)
 #apply a basic threshold of 0.5
-error_glm1se = mean(ifelse(lasso.pred > 0.5, 1, 0) != ytest) #0.1266968 -- not bad!
-error_glm1se #slightly higher
+error_glm1se = mean(lasso.pred1se != ytest$Target) 
+error_glm1se #almost the same but model is more parsimonious
+##confusion matrix
+table(lasso.pred1se, ytest$Target)
 
+require(pROC)
+roc_object = roc(ytest$Target, lasso.pred1se)
+auc(roc_object) #0.9072
+plot.roc(roc_object)
