@@ -9,13 +9,13 @@ test_data = read.csv("test_data_two_class.csv", header = TRUE)
 
 #scaling is not necessary for random forests
 xtrain = train_data[ , !(names(train_data) %in% "Target")]
-xtrain = scale(xtrain) #scaling needed for lasso
 xtest = test_data[ , !(names(test_data) %in% "Target")]
 ytrain = train_data["Target"]
 ytrain$Target = ifelse(ytrain$Target == "Dropout", 1, 0) 
 ytest = test_data["Target"]
 ytest$Target = ifelse(ytest$Target == "Dropout", 1, 0) 
 
+#this does bagging for OOB error calculation so technically no need for cv.
 randomforestclassifier = function(ntree){
   require(randomForest)
   set.seed(120)  # Setting seed 
@@ -50,10 +50,10 @@ randomforestclassifier = function(ntree){
   varImpPlot(classifier_RF, sort = FALSE, main = "Variable Importance Plot")
 }
 
-# 500 trees. #Test set error rate: 28.05%.  OOB estimate of  error rate: 12.35%. 
-#auc=0.5827.
+# 500 trees. #Test set error rate: 13.21%.  OOB estimate of  error rate: 11.96%. 
+#auc=0.8292
 #No. of variables tried at each split: 6
 randomforestclassifier(500) 
-#Test set error rate: 24.52%.OOB estimate of  error rate: 12.84%. auc: 0.6539
+#Test set error rate: 13.67%.OOB estimate of  error rate: 12.74%. auc: 0.8207
 randomforestclassifier(100)
 
