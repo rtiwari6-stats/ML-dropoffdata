@@ -4,14 +4,19 @@
 #Check current working directory with getwd()
 #Set current working directory with setwd()
 #read two class datasets
-train_data = read.csv("train_data_two_class.csv", header = TRUE)
-test_data = read.csv("test_data_two_class.csv", header = TRUE)
+source("rohan_playground\\DataUtilities.R")
+datasets = read_data()
+train_data = datasets$train_data
+test_data = datasets$test_data
+factors = datasets$factors
 
 library(glmnet)
 
 xtrain = train_data[ , !(names(train_data) %in% "Target")]
-xtrain = scale(xtrain) #scaling needed for lasso
+xtrain = scale(xtrain[ , !(names(xtrain) %in% factors)]) #scaling needed for lasso
 xtest = test_data[ , !(names(test_data) %in% "Target")]
+xtest = scale(xtest[ , !(names(xtest) %in% factors)])
+
 ytrain = train_data["Target"]
 ytrain$Target = ifelse(ytrain$Target == "Dropout", 1, 0) #needed for glmnet to work.
 ytest = test_data["Target"]
@@ -29,18 +34,18 @@ coef_cv=coef(cv.out, s = "lambda.min")
 coef_cv
 
 #Test error with bestlam
-lasso.pred = predict(cv.out, s = bestlam, newx = as.matrix(scale(xtest)), type="response")
+lasso.pred = predict(cv.out, s = bestlam, newx = as.matrix(xtest), type="response")
 
 #apply a basic threshold of 0.5
 lasso.pred = ifelse(lasso.pred > 0.5, 1, 0)
-error_glm = mean(lasso.pred != ytest$Target) #0.1266968 -- not bad!
+error_glm = mean(lasso.pred != ytest$Target) #0.160181 -- not bad!
 error_glm
 ##confusion matrix
 table(lasso.pred, ytest$Target)
 #roc auc
 require(pROC)
 roc_object = roc(ytest$Target, lasso.pred)
-auc(roc_object) #0.8266
+auc(roc_object) #0.7819
 plot(roc_object)
 
 
