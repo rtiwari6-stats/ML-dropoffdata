@@ -4,8 +4,11 @@
 #Check current working directory with getwd()
 #Set current working directory with setwd()
 #read two class datasets
-train_data = read.csv("train_data_two_class.csv", header = TRUE)
-test_data = read.csv("test_data_two_class.csv", header = TRUE)
+source("rohan_playground\\DataUtilities.R")
+datasets = read_data()
+train_data = datasets$train_data
+test_data = datasets$test_data
+factors = datasets$factors
 
 #scaling is not necessary for random forests
 xtrain = train_data[ , !(names(train_data) %in% "Target")]
@@ -41,6 +44,8 @@ randomforestclassifier = function(ntree){
   
   #compute roc auc
   require(pROC)
+  xtest = rbind(xtrain[1, ] , xtest)
+  xtest = xtest[-1,]
   pred=predict(classifier_RF, newdata = xtest, type="prob")
   pred = ifelse(pred[,2] > 0.5, 1, 0)
   roc_object = roc(ytest$Target, pred)
