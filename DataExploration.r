@@ -92,6 +92,10 @@ boxplot(train_data$Inflation.rate~train_data$Target,
         ylab = "Inflation.rate", xlab = "Target")# nothing stands out?
 boxplot(train_data$Unemployment.rate~train_data$Target, ylab = "Unemployment.rate",
         xlab = "Target") #hmmm, nothing special?
+boxplot(train_data$GDP~train_data$Scholarship.holder, ylab = "GDP", xlab = "Scholarship")
+boxplot(train_data$Inflation.rate~train_data$Scholarship.holder, ylab = "Inflation.Rate", xlab = "Scholarship")
+boxplot(train_data$Unemployment.rate~train_data$Scholarship.holder, 
+        ylab = "Unemployment.Rate", xlab = "Scholarship")
 
 #too many variables so we stop doing variable by variable
 #let's do automated
