@@ -78,3 +78,4 @@ plot_histogram(train)
 plot_qq(train)
 
 boxplot(GDP~Target, ylab = "GDP", xlab = "Target")
+boxplot(Inflation.rate~Target,ylab = "Inflation",xlab = "Target")
