@@ -34,8 +34,7 @@ randomforestclassifier = function(ntree){
   #print(classifier_RF$err.rate) #OOB error on training data
   plot(1:ntree, classifier_RF$err.rate[,1], main = "Number of trees vs OOB error in training", 
        xlab = "number of trees", ylab = "OOB error")
-  #print(classifier_RF$importance) #variable importance
-  
+
   #look at testset metrics
   #print(classifier_RF$test$err.rate) #in-place error on testing data
   plot(1:ntree, classifier_RF$test$err.rate[,1], main = "Number of trees vs error rate in testing", 
@@ -52,12 +51,18 @@ randomforestclassifier = function(ntree){
   plot.roc(roc_object)
   
   varImpPlot(classifier_RF, sort = FALSE, main = "Variable Importance Plot")
+  
+  #test error using the optimal threshold
+  test_error = mean(ytest$Target != ifelse(pred[,2] > 
+                                             coords(roc_object, "best", ret = "threshold")[1,], 1, 0))
+  print(test_error) 
 }
 
 # 500 trees. #Test set error rate: 13.21%.  OOB estimate of  error rate: 11.96%. 
 #auc=0.9101
 #No. of variables tried at each split: 6
+#Overall test error is 0.1348416.
 randomforestclassifier(500) 
 #Test set error rate: 13.67%.OOB estimate of  error rate: 12.74%. auc: 0.9058
-randomforestclassifier(100)
+randomforestclassifier(100) #overall test error is 0.1330317
 
