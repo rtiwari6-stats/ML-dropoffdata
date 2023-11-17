@@ -11,7 +11,7 @@ test_data = datasets$test_data
 factors = datasets$factors
 
 library(glmnet)
-
+set.seed(100)
 xtrain = train_data[ , !(names(train_data) %in% "Target")]
 xtrain = scale(xtrain[ , !(names(xtrain) %in% factors)]) #scaling needed for lasso
 xtest = test_data[ , !(names(test_data) %in% "Target")]
@@ -34,19 +34,19 @@ coef_cv=coef(cv.out, s = "lambda.min")
 coef_cv
 
 #Test error with bestlam
-lasso.pred = predict(cv.out, s = bestlam, newx = as.matrix(xtest), type="response")
+lasso.pred_base = predict(cv.out, s = bestlam, newx = as.matrix(xtest), type="response")
+#roc auc
+require(pROC)
+roc_object = roc(ytest$Target, lasso.pred_base[,1])
+auc(roc_object) #0.8858
+plot(roc_object)
 
-#apply a basic threshold of 0.5
-lasso.pred = ifelse(lasso.pred > 0.5, 1, 0)
-error_glm = mean(lasso.pred != ytest$Target) #0.160181 -- not bad!
+lasso.pred = ifelse(lasso.pred_base > 
+                      coords(roc_object, "best", ret = "threshold")[1,], 1, 0)
+error_glm = mean(lasso.pred != ytest$Target) #0.19819 -- not bad!
 error_glm
 ##confusion matrix
 table(lasso.pred, ytest$Target)
-#roc auc
-require(pROC)
-roc_object = roc(ytest$Target, lasso.pred[,1])
-auc(roc_object) #0.7884
-plot(roc_object)
 
 
 #also try using lambda1se
@@ -58,16 +58,15 @@ plot(roc_object)
 coef_cv1se=coef(cv.out, s = "lambda.1se")
 coef_cv1se
 
+lasso.pred1se_base = predict(cv.out, s = lambda1se, newx = as.matrix(scale(xtest)), type="response")
+require(pROC)
+roc_object = roc(ytest$Target, lasso.pred1se_base[,1])
+auc(roc_object) #0.8871
+plot.roc(roc_object)
+
 #Test error with lambda1se
-lasso.pred1se = predict(cv.out, s = lambda1se, newx = as.matrix(scale(xtest)), type="response")
-lasso.pred1se = ifelse(lasso.pred1se > 0.5, 1, 0)
-#apply a basic threshold of 0.5
+lasso.pred1se = ifelse(lasso.pred1se_base > coords(roc_object, "best", ret = "threshold")[1,], 1, 0)
 error_glm1se = mean(lasso.pred1se != ytest$Target) 
-error_glm1se #almost the same but model is more parsimonious
+error_glm1se #0.1954751
 ##confusion matrix
 table(lasso.pred1se, ytest$Target)
-
-require(pROC)
-roc_object = roc(ytest$Target, lasso.pred1se[,1])
-auc(roc_object) #0.7919
-plot.roc(roc_object)
