@@ -24,7 +24,7 @@ ytest$Target = ifelse(ytest$Target == "Dropout", 1, 0) #needed for glmnet to wor
 
 
 # Lasso model using lambda chosen by cross-validation
-cv.out = cv.glmnet(as.matrix(xtrain), as.matrix(ytrain), alpha=1)
+cv.out = cv.glmnet(as.matrix(xtrain), as.matrix(ytrain), alpha=1, family="binomial")
 plot(cv.out)
 bestlam = cv.out$lambda.min 
 lambda1se = cv.out$lambda.1se
@@ -44,8 +44,8 @@ error_glm
 table(lasso.pred, ytest$Target)
 #roc auc
 require(pROC)
-roc_object = roc(ytest$Target, lasso.pred)
-auc(roc_object) #0.7819
+roc_object = roc(ytest$Target, lasso.pred[,1])
+auc(roc_object) #0.7884
 plot(roc_object)
 
 
@@ -68,6 +68,6 @@ error_glm1se #almost the same but model is more parsimonious
 table(lasso.pred1se, ytest$Target)
 
 require(pROC)
-roc_object = roc(ytest$Target, lasso.pred1se)
-auc(roc_object) #0.9072
+roc_object = roc(ytest$Target, lasso.pred1se[,1])
+auc(roc_object) #0.7919
 plot.roc(roc_object)
