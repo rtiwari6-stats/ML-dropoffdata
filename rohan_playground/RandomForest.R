@@ -47,8 +47,7 @@ randomforestclassifier = function(ntree){
   xtest = rbind(xtrain[1, ] , xtest)
   xtest = xtest[-1,]
   pred=predict(classifier_RF, newdata = xtest, type="prob")
-  pred = ifelse(pred[,2] > 0.5, 1, 0)
-  roc_object = roc(ytest$Target, pred)
+  roc_object = roc(ytest$Target, pred[,2])
   print(auc(roc_object)) 
   plot.roc(roc_object)
   
@@ -56,9 +55,9 @@ randomforestclassifier = function(ntree){
 }
 
 # 500 trees. #Test set error rate: 13.21%.  OOB estimate of  error rate: 11.96%. 
-#auc=0.8292
+#auc=0.9101
 #No. of variables tried at each split: 6
 randomforestclassifier(500) 
-#Test set error rate: 13.67%.OOB estimate of  error rate: 12.74%. auc: 0.8207
+#Test set error rate: 13.67%.OOB estimate of  error rate: 12.74%. auc: 0.9058
 randomforestclassifier(100)
 
