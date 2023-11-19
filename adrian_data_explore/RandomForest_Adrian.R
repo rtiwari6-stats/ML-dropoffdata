@@ -4,7 +4,8 @@
 #Check current working directory with getwd()
 #Set current working directory with setwd()
 #read two class datasets
-source("rohan_playground\\DataUtilities.R")
+getwd()
+source("adrian_data_explore\\DataUtilities.R")
 datasets = read_data()
 train_data = datasets$train_data
 test_data = datasets$test_data
