@@ -20,7 +20,7 @@ ytest = test_data["Target"]
 ytest$Target = ifelse(ytest$Target == "Dropout", 1, 0) 
 
 #this does bagging for OOB error calculation so technically no need for cv.
-randomforestclassifier = function(ntree){
+randomforestclassifier = function(ntree, maxnodes=NULL){
   require(randomForest)
   set.seed(120)  # Setting seed 
   classifier_RF = randomForest(x = xtrain, 
@@ -29,13 +29,14 @@ randomforestclassifier = function(ntree){
                                ytest = as.factor(ytest$Target),
                                importance = TRUE,
                                keep.forest = TRUE,
-                               ntree = ntree) 
+                               ntree = ntree,
+                               maxnodes=maxnodes) 
   print(classifier_RF) 
   print(classifier_RF$confusion) #confusion matrix
   #print(classifier_RF$err.rate) #OOB error on training data
   plot(1:ntree, classifier_RF$err.rate[,1], main = "Number of trees vs OOB error in training", 
        xlab = "number of trees", ylab = "OOB error")
-
+  
   #look at testset metrics
   #print(classifier_RF$test$err.rate) #in-place error on testing data
   plot(1:ntree, classifier_RF$test$err.rate[,1], main = "Number of trees vs error rate in testing", 
@@ -59,11 +60,57 @@ randomforestclassifier = function(ntree){
   print(test_error) 
 }
 
-# 500 trees. #Test set error rate: 13.21%.  OOB estimate of  error rate: 11.96%. 
-#auc=0.9101
-#No. of variables tried at each split: 6
-#Overall test error is 0.1348416.
-randomforestclassifier(500) 
-#Test set error rate: 13.67%.OOB estimate of  error rate: 12.74%. auc: 0.9058
-randomforestclassifier(100) #overall test error is 0.1330317
+#OOB estimate of  error rate: 19.34%
+#Test set error rate: 21.36%
+#auc: 0.8591
+randomforestclassifier(500, 2) 
 
+#OOB estimate of  error rate: 16.21%
+#Test set error rate: 17.65%
+#auc: 0.8682
+randomforestclassifier(500, 4) 
+
+#OOB estimate of  error rate: 15.19%
+#Test set error rate: 16.38%
+#auc: 0.8803
+randomforestclassifier(500, 8) 
+
+# OOB estimate of  error rate: 12.29%
+# Test set error rate: 13.67%
+#auc:  0.9101
+#note that larger trees will take longer training time
+randomforestclassifier(500, NULL)  
+
+
+#OOB estimate of  error rate: 18.56%
+#Test set error rate: 20.18%
+#auc: 0.8583
+randomforestclassifier(100, 2) 
+
+#OOB estimate of  error rate: 15.97%
+#Test set error rate: 17.65%
+#auc: 0.8666
+randomforestclassifier(100, 4) 
+
+#OOB estimate of  error rate: 15.37%
+# Test set error rate: 16.65%
+#auc: 0.8711
+randomforestclassifier(100, 8) 
+
+#OOB estimate of  error rate: 12.23%
+#Test set error rate: 12.94%
+#auc: 0.9058
+randomforestclassifier(100, NULL) 
+
+options(scipen=999)
+install.packages('randomForestSRC')
+library(randomForestSRC)
+o<-rfsrc(Target~., data = train_data_1,block.size = 1,forest = TRUE,importance = TRUE)
+plot(o, m.target = NULL,
+     plots.one.page = FALSE, sorted = TRUE, verbose = TRUE)
+plot(o)
+test_data_1=test_data
+test_data_1$Target=as.factor(test_data_1$Target)
+o.pred <-predict(object = o, test_data_1,block.size = 1)
+o.pred
+plot(o.pred)
